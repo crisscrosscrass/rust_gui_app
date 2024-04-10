@@ -1,10 +1,11 @@
-use egui::{menu, CentralPanel, Context, DroppedFile, SidePanel, TopBottomPanel };
+use egui::{menu, CentralPanel, Context, DroppedFile, Image, ScrollArea, SidePanel, TopBottomPanel };
 
 use super::ExampleApp;
 
 pub fn update_ui(ctx: &Context, app: &mut ExampleApp) {
     draw_top_panel(ctx, &mut app.picked_path);
     draw_central_panel(ctx, &mut app.input_text);
+    draw_another_panel(ctx);
     draw_right_panel(ctx, &mut app.dropped_files, &mut app.picked_path);
     preview_files_being_dropped(ctx);
 }
@@ -13,9 +14,11 @@ pub fn draw_central_panel(ctx: &Context, input_text: &mut String) {
     CentralPanel::default().show(ctx, |ui| {
         ui.heading("Main Area");
         ui.horizontal(|ui| {
-            ui.label(format!("Input Field: "));
+            ui.label(format!("Name: "));
             ui.separator();
-            ui.text_edit_singleline(input_text);
+            ui.horizontal(|ui| {
+                ui.text_edit_singleline(input_text);
+            });
         });
         ui.horizontal(|ui| {
             ui.label(format!("Ausgabe: "));
@@ -59,10 +62,22 @@ pub fn draw_top_panel(ctx: &Context, picked_path: &mut Option<String>) {
     });
 }
 
+pub fn draw_another_panel(ctx: &Context) {
+    SidePanel::right("my_right_panel2").min_width(400.00).show(ctx, |ui| {
+        ui.heading("Rechte Seite 2");
+        ScrollArea::both().max_width(200.00).show(ui, |ui| {
+            ui.add(
+                Image::new("https://picsum.photos/seed/1.759706314/1024").rounding(10.0),
+            );
 
+            ui.image(egui::include_image!("../assets/PremiumContent.png"));
+        });
+        ui.spinner();
+    });
+}
 
 pub fn draw_right_panel(ctx: &Context, dropped_files: &mut Vec<DroppedFile>, picked_path: &mut Option<String>) {
-    SidePanel::right("my_right_panel").show(ctx, |ui| {
+    SidePanel::right("my_right_panel").min_width(400.00).show(ctx, |ui| {
         ui.heading("Rechte Seite");
         ui.label("Drag-and-drop test!");
 
@@ -72,12 +87,14 @@ pub fn draw_right_panel(ctx: &Context, dropped_files: &mut Vec<DroppedFile>, pic
             }
         }
 
-        if let Some(picked_path) = picked_path {
-            ui.horizontal(|ui| {
-                ui.label("Picked file:");
-                ui.monospace(picked_path);
-            });
-        }
+        ScrollArea::horizontal().max_width(200.00).auto_shrink(true).show(ui, |ui| {
+            if let Some(picked_path) = picked_path {
+                ui.horizontal(|ui| {
+                    ui.label("Picked file:");
+                    ui.monospace(picked_path);
+                });
+            }
+        });
 
         if !dropped_files.is_empty() {
             ui.group(|ui| {

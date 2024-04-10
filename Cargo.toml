@@ -8,4 +8,7 @@ edition = "2021"
 [dependencies]
 eframe = "*"
 egui = "*"
+egui_extras = { version = "*", features = ["all_loaders"] }
 rfd = "*"
+
+image = "*"
